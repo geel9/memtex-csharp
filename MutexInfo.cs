@@ -31,7 +31,7 @@ namespace MemtexCS
         /// <summary>
         /// Used for safely releasing a mutex
         /// </summary>
-        public string CasToken;
+        public ulong CasToken;
 
         /// <summary>
         /// True if we currently own this mutex

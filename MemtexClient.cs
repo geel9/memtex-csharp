@@ -8,10 +8,10 @@ using System.Threading;
 namespace Memtex
 {
     /// <summary>
-    /// A Memtex instance represents a single "server" -- attempting to re-acquire a mutex using a Memtex that it owns will return true immediately.
-    /// Using Memtex for mutual exclusion amongst multiple threads on one application requires unique Memtex instances; that said, consider using actual Mutexes.
+	/// A MemtexClient instance represents a single "server" -- attempting to re-acquire a mutex using a MemtexClient that it owns will return true immediately.
+	/// Using MemtexClient for mutual exclusion amongst multiple threads on one application requires unique MemtexClient instances; that said, consider using actual Mutexes.
     /// </summary>
-    public class Memtex
+    public class MemtexClient
     {
         /// <summary>
         /// The client that Memtex uses to communicate with the memcached server. You should write your own implementation or use one of the provided classes on the github repo.
@@ -40,10 +40,10 @@ namespace Memtex
         private Dictionary<string, MutexInfo> _ownedMutexes = new Dictionary<string, MutexInfo>();
 
         /// <summary>
-        /// Instantiates a new Memtex instance
+		/// Instantiates a new MemtexClient instance
         /// </summary>
         /// <param name="client">An implementation of IMemcachedImplementation to communicate with a memcached server</param>
-        public Memtex(IMemcachedImplementation client, string GUID = "")
+		public MemtexClient(IMemcachedImplementation client, string GUID = "")
         {
             this.MemcachedClient = client;
 
@@ -87,19 +87,21 @@ namespace Memtex
             DateTime beganAcquiring = DateTime.Now;
             string memcachedKey = this.KeyPrefix + name;
 
-            string casToken = "";
+            ulong casToken = 0;
 
             while (((DateTime.Now - beganAcquiring).TotalMilliseconds < msTimeout) || msTimeout == -1)
             {
                 object currentOwnerRaw = this.MemcachedClient.Get(memcachedKey, ref casToken);
                 if (currentOwnerRaw == null)
                 {
-                    bool setOwner = casToken == null ? this.MemcachedClient.Add(memcachedKey, this.GUID, memcachedLifetime)
+                    bool setOwner = casToken == 0 ? this.MemcachedClient.Add(memcachedKey, this.GUID, memcachedLifetime)
                                                      : this.MemcachedClient.Cas(memcachedKey, this.GUID, casToken, memcachedLifetime);
                     if (setOwner)
                     {
-                        string newCasToken = "";
+                        ulong newCasToken = 0;
                         string newOwner = (string)this.MemcachedClient.Get(memcachedKey, ref newCasToken);
+
+						Console.WriteLine(newCasToken);
 
                         if (newOwner == this.GUID)
                         {

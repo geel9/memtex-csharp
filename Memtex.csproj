@@ -40,7 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IMemcachedImplementation.cs" />
-    <Compile Include="Memtex.cs" />
+    <Compile Include="MemtexClient.cs" />
     <Compile Include="MutexInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

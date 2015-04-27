@@ -8,10 +8,10 @@ namespace Memtex
 {
     public interface IMemcachedImplementation
     {
-        object Get(string key, ref string casToken);
+        object Get(string key, ref ulong casToken);
 
         bool Add(string key, object value, long lifetime);
 
-        bool Cas(string key, object value, string casToken, long lifetime);
+		bool Cas(string key, object value, ulong casToken, long lifetime);
     }
 }
