@@ -53,6 +53,13 @@ namespace Memtex
             this.GUID = GUID;
         }
 
+        /// <summary>
+        /// Acquires a mutex.
+        /// </summary>
+        /// <param name="name">The name of the mutex to acquire</param>
+        /// <param name="msTimeout">The milliseconds to wait before giving up on acquiring</param>
+        /// <param name="msLifetime">The maximum length of time the mutex will last after being acquired; -1 for infinity.</param>
+        /// <returns>True on success, false on failure.</returns>
         public bool AcquireMutex(string name, long msTimeout, long msLifetime)
         {
             if (OwnsMutex(name)) return true;
@@ -114,6 +121,11 @@ namespace Memtex
             return false;
         }
 
+
+        /// <summary>
+        /// Releases the specified mutex, if owned.
+        /// </summary>
+        /// <param name="name">The name of the mutex to release</param>
         public void ReleaseMutex(string name)
         {
             if (!OwnsMutex(name)) return;
@@ -122,13 +134,24 @@ namespace Memtex
             this.SetOwned(mutex, false);
         }
 
+        /// <summary>
+        /// Finds and returns whether or not this Memtex instance owns the specified mutex.
+        /// </summary>
+        /// <param name="name">The name of the mutex to check against</param>
+        /// <returns>True if the mutex is owned, false otherwise.</returns>
         public bool OwnsMutex(string name)
         {
             if (!_ownedMutexes.ContainsKey(name)) return false;
             return _ownedMutexes[name].IsAcquired;
         }
 
-        public void SetOwned(MutexInfo info, bool isAcquired)
+
+        /// <summary>
+        /// Simple helper method to set the acquired state and time acquired of a MutexInfo.
+        /// </summary>
+        /// <param name="info">The MutexInfo to set the status of</param>
+        /// <param name="isAcquired">True if the mutex is owned; false otherwise.</param>
+        private void SetOwned(MutexInfo info, bool isAcquired)
         {
             info.Attached = isAcquired;
             if (isAcquired) info.TimeAcquired = DateTime.Now;
