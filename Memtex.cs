@@ -62,7 +62,11 @@ namespace Memtex
         /// <returns>True on success, false on failure.</returns>
         public bool AcquireMutex(string name, long msTimeout, long msLifetime)
         {
+			if(msLifetime < -1 || msLifetime == 0) throw new ArgumentOutOfRangeException("msLifetime", "msLifetime must be either -1 or a positive integer.");
+
             if (OwnsMutex(name)) return true;
+
+	        long memcachedLifetime = (msLifetime == -1) ? 0 : msLifetime; //Memcached requires a lifetime of 0 for infinite-length mutexes
 
             MutexInfo mutex;
             if (!_ownedMutexes.ContainsKey(name))
@@ -90,8 +94,8 @@ namespace Memtex
                 object currentOwnerRaw = this.MemcachedClient.Get(memcachedKey, ref casToken);
                 if (currentOwnerRaw == null)
                 {
-                    bool setOwner = casToken == null ? this.MemcachedClient.Add(memcachedKey, this.GUID, msLifetime)
-                                                     : this.MemcachedClient.Cas(memcachedKey, this.GUID, casToken, msLifetime);
+                    bool setOwner = casToken == null ? this.MemcachedClient.Add(memcachedKey, this.GUID, memcachedLifetime)
+                                                     : this.MemcachedClient.Cas(memcachedKey, this.GUID, casToken, memcachedLifetime);
                     if (setOwner)
                     {
                         string newCasToken = "";
