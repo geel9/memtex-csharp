@@ -101,8 +101,6 @@ namespace Memtex
 						ulong newCasToken = 0;
 						string newOwner = (string)this.MemcachedClient.Get(memcachedKey, ref newCasToken);
 
-						Console.WriteLine(newCasToken);
-
 						if (newOwner == this.GUID)
 						{
 							mutex.CasToken = newCasToken;
