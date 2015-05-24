@@ -31,7 +31,7 @@ namespace Memtex
 		/// <summary>
 		/// Milliseconds to sleep between each failed Mutex acquisition
 		/// </summary>
-		public int SleepTime = 50;
+		public int SleepTime = 10;
 
 
 		/// <summary>
